@@ -6,6 +6,8 @@ import React, { useState, useEffect, useRef } from 'react';
 export default function Home() {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState('');
+  const [username, setUsername] = useState('');
+  const [isUsernameSet, setIsUsernameSet] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
   const socket = io('http://localhost:3001');
@@ -28,9 +30,10 @@ export default function Home() {
   }, []);
 
   const handleSendMessage = () => {
-    if (input.trim() && socketRef.current) {
-      setMessages((prevMessages) => [...prevMessages, input]);
-      socketRef.current.emit('message-send', input);
+    if (input.trim() && socketRef.current && isUsernameSet) {
+      const messageWithUser = `${username}: ${input}`;
+      setMessages((prevMessages) => [...prevMessages, messageWithUser]);
+      socketRef.current.emit('message-send', messageWithUser);
       setInput('');
     }
   };
@@ -41,11 +44,37 @@ export default function Home() {
     }
   };
 
+  const handleSetUsername = () => {
+    if (username.trim()) {
+      setIsUsernameSet(true);
+    }
+  };
+
+  if (!isUsernameSet) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Welcome to Chat Room</h2>
+        <p>Please enter your username to start chatting</p>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSetUsername()}
+          placeholder="Enter your username..."
+          style={{ padding: '10px', marginRight: '10px' }}
+        />
+        <button onClick={handleSetUsername} style={{ padding: '10px' }}>
+          Join Chat
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
       <div>
         <div>
-          <h2>Chat Room</h2>
+          <h2>Chat Room - {username}</h2>
           <p style={{ fontSize: '14px', color: '#666' }}>
             Connected users can chat in real-time
           </p>
