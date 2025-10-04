@@ -35,17 +35,33 @@ export default function Home() {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
   return (
     <>
       <div>
         <div>
           <h2>Chat Room</h2>
+          <p style={{ fontSize: '14px', color: '#666' }}>
+            Connected users can chat in real-time
+          </p>
           <div id="messages">
             {messages.map((msg, index) => (
               <div key={index}>{msg}</div>
             ))}
           </div>
-          <input id="messageInput" type="text" onChange={(e) => setInput(e.target.value)} value={input} placeholder="Type your message..." />
+          <input 
+            id="messageInput" 
+            type="text" 
+            onChange={(e) => setInput(e.target.value)} 
+            onKeyPress={handleKeyPress}
+            value={input} 
+            placeholder="Type your message..." 
+          />
           <button id="sendMessage" onClick={handleSendMessage}>Send</button>
         </div>
       </div>

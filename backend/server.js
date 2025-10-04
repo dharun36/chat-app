@@ -20,13 +20,27 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log(`User ${socket.id} connected`);
-})
-
-io.on('message-send', (message) => {
-  io.emit('message', message);
+  
+  // Send welcome message to newly connected user
+  socket.emit('message', { 
+    text: 'Welcome to the chat!', 
+    user: 'System',
+    timestamp: new Date().toISOString()
+  });
+  
+  // Handle incoming messages
+  socket.on('message-send', (message) => {
+    io.emit('message', message);
+  });
+  
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    console.log(`User ${socket.id} disconnected`);
+  });
 });
 
 
 server.listen(3001, () => {
   console.log('Server is running on http://localhost:3001');
+  console.log('Chat server ready to accept connections!');
 });
